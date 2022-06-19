@@ -1,0 +1,9 @@
+# pyproject.toml
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=html:tests/htmlcov"
+pythonpath = "src"
+testpaths = "tests"
+
+[tool.pylint.'MASTER']
+init-hook = 'import sys; sys.path.append("src")'
