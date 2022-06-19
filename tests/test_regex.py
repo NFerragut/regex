@@ -209,3 +209,11 @@ class Test3RegexConfigFile():
         ]
         assert app.stderr == ''
         assert app.returncode == 0
+
+    @staticmethod
+    def test_backslash_to_forslash(app: RunApp, section_config):
+        app.input = 'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm.cmd'
+        app.run(section_config, '-s', 'back-to-forward')
+        assert app.stdout == 'C:/Program Files/nodejs/node_modules/npm/bin/npm.cmd'
+        assert app.stderr == ''
+        assert app.returncode == 0
