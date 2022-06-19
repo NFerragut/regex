@@ -28,7 +28,7 @@ class Test0StandardArguments():
     @staticmethod
     def test_version(app: RunApp):
         app.run('--version')
-        assert app.stdout == f'{app.name_only} version {editor.__version__}'
+        assert app.stdout == f'{app.name} version {editor.__version__}'
         assert app.stderr == ''
         assert app.returncode == 0
 
@@ -37,7 +37,7 @@ class Test0StandardArguments():
         app.run('--help')
         assert 'Read input text, transform it, and write it back.' in app.stdout_line
         assert (
-            f'usage: {app.name_only} [-h] [--version] [-s SECTION [SECTION ...]] [-i INFILE] '
+            f'usage: {app.name} [-h] [--version] [-s SECTION [SECTION ...]] [-i INFILE] '
             '[-d NAME:VALUE [NAME:VALUE ...]] [-o OUTFILE] [CONFIG]'
          ) in app.stdout_line
         assert 'positional arguments: CONFIG application configuration file' in app.stdout_line
@@ -64,7 +64,7 @@ class Test1Errors():
     def test_no_arguments(app: RunApp):
         app.run()
         assert app.stdout == ''
-        assert f'{app.name_only}: error: no input text provided' in app.stderr_lines
+        assert f'{app.name}: error: no input text provided' in app.stderr_lines
         assert app.returncode == 1
 
     @staticmethod
