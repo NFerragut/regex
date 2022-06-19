@@ -57,8 +57,8 @@ class Regex():
 
         Return True if the expression is a valid search expression.
         """
-        # Groups:                   1-12-                -2  3-      -3
-        if found := re.fullmatch(r's(.)(.*?(?<!\\)(?:\\\\))\1([agims]*)', expression):
+        # Groups:                   1-12-                 -2  3-      -3
+        if found := re.fullmatch(r's(.)(.*?(?<!\\)(?:\\\\)*)\1([agims]*)', expression):
             self.pattern = found[2]
             self.replacement = None
             self._set_regex_flags(found[3])
