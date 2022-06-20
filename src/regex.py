@@ -74,7 +74,9 @@ class Regex():
         if found := re.fullmatch(r's(.)(.*?(?<!\\)(?:\\\\)*)\1(.*?(?<!\\)(?:\\\\)*)\1([agims]*)',
                                  expression):
             self.pattern = found[2]
-            self.replacement = found[3]
+            # Groups:                          1-       -1  2--2
+            self.replacement = re.sub(r'(?<!\$)((?:\$\$)*)\$(\d)', r'\1\\\2', found[3]) \
+                                 .replace('$$', '$')
             self._set_regex_flags(found[4])
             return True
         return False

@@ -200,6 +200,39 @@ class Test3RegexConfigFile():
         assert app.returncode == 0
 
     @staticmethod
+    def test_reference_groups_with_backslash_or_dollar(app: RunApp, section_config):
+        app.run(section_config, '-s', 'swap-words')
+        assert app.stdout_lines == [
+            'frantic Five fled frogs fifty from fishes fierce.',
+            'Stu If shoes chews, Stu should the choose he shoes chews?',
+            'saw I saw a could that saw out saw any ever I saw saw.'
+        ]
+        assert app.stderr == ''
+        assert app.returncode == 0
+
+    @staticmethod
+    def test_dollar_referenced_groups_with_dollar_prefix(app: RunApp, section_config):
+        app.run(section_config, '-s', 'insert-dollar')
+        assert app.stdout_lines == [
+            '$frantic $Five $fled $frogs $fifty $from $fishes $fierce.',
+            '$Stu $If $shoes $chews, $Stu $should $the $choose $he $shoes chews?',
+            '$saw $I $saw $a $could $that $saw $out $saw $any $ever $I $saw $saw.'
+        ]
+        assert app.stderr == ''
+        assert app.returncode == 0
+
+    @staticmethod
+    def test_insert_one_dollar_for_every_other_word(app: RunApp, section_config):
+        app.run(section_config, '-s', 'subst-one-dollar')
+        assert app.stdout_lines == [
+            'Five $1 frogs $1 from $1 fierce $1.',
+            'If $1 chews $1, should $1 choose $1 shoes $1 chews?',
+            'I $1 a $1 that $1 out $1 any $1 I $1 saw $1.'
+        ]
+        assert app.stderr == ''
+        assert app.returncode == 0
+
+    @staticmethod
     def test_definition_regex(app: RunApp, section_config):
         app.run(section_config, '-s', 'use-def-regex', '-d', 'THING:see')
         assert app.stdout_lines == [
