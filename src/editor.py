@@ -146,9 +146,6 @@ class Editor():
                 regexes.append(regex)
         return regexes
 
-    def _get_text_destination(self, section: str) -> str:
-        return self._config.get(section, 'output', fallback=self.default_outfile)
-
     def _write_output(self):
         """Write the text to the output destination."""
         filename = self._config.get(self._section, 'output', fallback=self.default_outfile)
