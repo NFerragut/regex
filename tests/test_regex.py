@@ -38,7 +38,7 @@ class Test0StandardArguments():
         assert 'Read input text, transform it, and write it back.' in app.stdout_line
         assert (
             f'usage: {app.name} [-h] [--version] [-s SECTION [SECTION ...]] [-i INFILE] '
-            '[-d NAME:VALUE [NAME:VALUE ...]] [-o OUTFILE] [CONFIG]'
+            '[-r REGEXP [REGEXP ...]] [-d NAME:VALUE [NAME:VALUE ...]] [-o OUTFILE] [CONFIG]'
          ) in app.stdout_line
         assert 'positional arguments: CONFIG application configuration file' in app.stdout_line
         assert (
@@ -48,6 +48,8 @@ class Test0StandardArguments():
             ' -s SECTION [SECTION ...], --section SECTION [SECTION ...]'
                     ' section(s) of configuration file to apply'
             ' -i INFILE, --input INFILE file with input text for simple configuration'
+            ' -r REGEXP [REGEXP ...], --regexp REGEXP [REGEXP ...]'
+                    ' transform text with regular expression(s)'
             ' -d NAME:VALUE [NAME:VALUE ...], --definition NAME:VALUE [NAME:VALUE ...]'
                     ' replace NAME with VALUE in regular expression(s)'
             ' -o OUTFILE, --output OUTFILE'
@@ -87,6 +89,18 @@ class Test2EmptyConfigFile():
         app.input = TEST_TEXT
         app.run(no_config)
         assert app.stdout == TEST_TEXT
+        assert app.stderr == ''
+        assert app.returncode == 0
+
+    @staticmethod
+    def test_stdin_command_line_regex_to_stdout(app: RunApp, no_config):
+        app.input = TEST_TEXT
+        app.run(no_config, '-r', 's/s(.)(.)/s$2$1/gi', 's/s(.) /s $1/gi')
+        assert app.stdout_lines == [
+            'Five frantic frogs fled from fifty fierce fisehs.',
+            'If sut chews shoes ,sohuld sut choos ethe sohes he chews?',
+            'I swa a swa that could out swa any swa I ever swa swa.'
+        ]
         assert app.stderr == ''
         assert app.returncode == 0
 
