@@ -16,10 +16,9 @@ _PROGRAM = os.path.basename(sys.argv[0])
 def main(args):
     """The main application."""
     try:
-        editor = Editor(infile=args.input, outfile=args.output)
+        editor = Editor(infile=args.input, expressions=args.regexp, outfile=args.output)
         editor.read_config(args.config)
-        if args.definition:
-            editor.add_definitions(args.definition)
+        editor.add_definitions(args.definition)
         for section in args.section:
             editor.edit(section)
         sys.exit()
@@ -55,6 +54,9 @@ def configure_parser(parser: ArgumentParser):
     parser.add_argument('-i', '--input',
                         metavar='INFILE',
                         help='file with input text for simple configuration')
+    parser.add_argument('-r', '--regexp',
+                        default=[], metavar='REGEXP', nargs='+',
+                        help='transform text with regular expression(s)')
     parser.add_argument('-d', '--definition',
                         default=[], metavar='NAME:VALUE', nargs='+',
                         help='replace NAME with VALUE in regular expression(s)')
@@ -68,12 +70,13 @@ def configure_parser(parser: ArgumentParser):
 class Editor():
     """Read input text, transform it, and write it back."""
 
-    def __init__(self, *, infile=None, outfile=None):
+    def __init__(self, *, infile=None, expressions=(), outfile=None):
         self._config = configparser.ConfigParser(empty_lines_in_values=False)
         self._section = ''
         self._stdin = None
         self._text = ''
         self.default_infile = infile
+        self.default_expressions = expressions
         self.default_outfile = outfile
         self.definitions = {}
 
@@ -130,15 +133,17 @@ class Editor():
 
     def _convert_text(self):
         """Convert the input text using the regular expressions for the selected section."""
-        regexes = self._get_regexes()
+        expressions = self._config.get(self._section, 'regex', fallback='').splitlines()
+        if not expressions:
+            expressions = self.default_expressions
+        regexes = self._get_regexes(expressions)
         for regex in regexes:
             self._text = regex.apply(self._text)
 
-    def _get_regexes(self) -> list[Regex]:
-        regexes = []
-        config_regex_text = self._config.get(self._section, 'regex', fallback='')
-        config_regex_list = config_regex_text.split('\n')
-        for expression in config_regex_list:
+    def _get_regexes(self, expressions: list[str]):
+        """Create a list of Regex objects based on the list of regular expressions."""
+        regexes: list[Regex] = []
+        for expression in expressions:
             for name, value in self.definitions.items():
                 expression = expression.replace(name, value)
             regex = Regex(expression)
